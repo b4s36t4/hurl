@@ -20,8 +20,11 @@ use crate::combinator::choice;
 use crate::parser::json::parse as parse_json;
 use crate::parser::multiline::multiline_string;
 use crate::parser::string::backtick_template;
-use crate::parser::{primitives, xml, ParseResult};
+use crate::parser::{primitives, ParseResult};
 use crate::reader::Reader;
+
+#[cfg(not(target_arch = "wasm32"))]
+use crate::parser::xml;
 
 pub fn bytes(reader: &mut Reader) -> ParseResult<Bytes> {
     choice(
@@ -29,6 +32,7 @@ pub fn bytes(reader: &mut Reader) -> ParseResult<Bytes> {
             multiline_string_bytes,
             string_bytes,
             json_bytes,
+            #[cfg(not(target_arch = "wasm32"))]
             xml_bytes,
             base64_bytes,
             hex_bytes,
@@ -38,6 +42,7 @@ pub fn bytes(reader: &mut Reader) -> ParseResult<Bytes> {
     )
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn xml_bytes(reader: &mut Reader) -> ParseResult<Bytes> {
     match xml::parse(reader) {
         Err(e) => Err(e),

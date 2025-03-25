@@ -55,4 +55,5 @@ mod query;
 mod sections;
 mod string;
 mod template;
+#[cfg(not(target_arch = "wasm32"))]
 mod xml;

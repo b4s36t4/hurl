@@ -61,4 +61,5 @@ mod template;
 mod value;
 mod value_impl;
 mod variable;
+#[cfg(not(target_arch = "wasm32"))]
 mod xpath;

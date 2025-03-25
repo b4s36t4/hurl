@@ -18,9 +18,11 @@
 mod style;
 mod styledstring;
 
-use colored::control;
 pub use style::*;
 pub use styledstring::*;
+
+#[cfg(not(target_arch = "wasm32"))]
+use colored::control;
 
 #[cfg(target_family = "unix")]
 pub fn init_crate_colored() {

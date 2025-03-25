@@ -40,4 +40,5 @@ mod to_float;
 mod to_int;
 mod url_decode;
 mod url_encode;
+#[cfg(not(target_arch = "wasm32"))]
 mod xpath;

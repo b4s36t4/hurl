@@ -20,3 +20,6 @@ pub mod command;
 pub mod curl;
 pub mod format;
 pub mod linter;
+
+#[cfg(target_arch = "wasm32")]
+pub mod wasm;
