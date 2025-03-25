@@ -61,10 +61,16 @@ impl ToSource for MultilineString {
             .map(|att| att.to_source())
             .collect::<Vec<_>>()
             .join(",");
+        source.push_str("```");
+        source.push_str(self.lang());
+        if !self.lang().is_empty() && !self.attributes.is_empty() {
+            source.push(',');
+        }
         source.push_str(&att);
         source.push_str(self.space.as_str());
         source.push_str(self.newline.as_str());
         source.push_str(self.kind.to_source().as_str());
+        source.push_str("```");
         source
     }
 }
@@ -86,6 +92,11 @@ impl MultilineString {
             | MultilineStringKind::Xml(text) => text.clone(),
             MultilineStringKind::GraphQl(text) => text.value.clone(),
         }
+    }
+
+    /// Returns true if this multiline string has `escape` or `novariable` attributes.
+    pub fn has_attributes(&self) -> bool {
+        !self.attributes.is_empty()
     }
 }
 

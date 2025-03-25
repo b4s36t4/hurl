@@ -43,6 +43,31 @@ impl Entry {
     pub fn source_info(&self) -> SourceInfo {
         self.request.space0.source_info
     }
+
+    /// Returns true if the request or the response uses multilines string attributes
+    pub fn use_multiline_string_body_with_attributes(&self) -> bool {
+        if let Some(Body {
+            value: Bytes::MultilineString(multiline),
+            ..
+        }) = &self.request.body
+        {
+            if multiline.has_attributes() {
+                return true;
+            }
+        }
+        if let Some(response) = &self.response {
+            if let Some(Body {
+                value: Bytes::MultilineString(multiline),
+                ..
+            }) = &response.body
+            {
+                if multiline.has_attributes() {
+                    return true;
+                }
+            }
+        }
+        false
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -168,7 +193,14 @@ impl Response {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Method(pub String);
+pub struct Method(String);
+
+impl Method {
+    /// Creates a new AST element method/
+    pub fn new(method: &str) -> Method {
+        Method(method.to_string())
+    }
+}
 
 impl fmt::Display for Method {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -180,12 +212,6 @@ impl fmt::Display for Method {
 pub struct Version {
     pub value: VersionValue,
     pub source_info: SourceInfo,
-}
-
-impl fmt::Display for Version {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.value)
-    }
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -214,12 +240,6 @@ impl fmt::Display for VersionValue {
 pub struct Status {
     pub value: StatusValue,
     pub source_info: SourceInfo,
-}
-
-impl fmt::Display for Status {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.value)
-    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -302,6 +322,7 @@ pub enum FilterValue {
     },
     ToFloat,
     ToInt,
+    ToString,
     UrlDecode,
     UrlEncode,
     XPath {
@@ -331,6 +352,7 @@ impl FilterValue {
             FilterValue::ToDate { .. } => "toDate",
             FilterValue::ToFloat => "toFloat",
             FilterValue::ToInt => "toInt",
+            FilterValue::ToString => "toString",
             FilterValue::UrlDecode => "urlDecode",
             FilterValue::UrlEncode => "urlEncode",
             FilterValue::XPath { .. } => "xpath",

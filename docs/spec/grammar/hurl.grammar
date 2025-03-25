@@ -104,7 +104,7 @@ file-param :
 
 file-value: "file," filename ";" (file-contenttype)?
 
-file-contenttype: [a-zA-Z0-9/+-]+
+file-contenttype: value-string
 
 capture:
   lt*
@@ -250,6 +250,7 @@ query:
     status-query
   | version-query
   | url-query
+  | ip-query
   | header-query
   | certificate-query
   | cookie-query
@@ -268,6 +269,8 @@ status-query: "status"
 version-query: "version"
 
 url-query: "url"
+
+ip-query: "ip"
 
 header-query: "header" sp quoted-string
 
@@ -319,6 +322,8 @@ predicate-func:
   | collection-predicate
   | date-predicate
   | iso-date-predicate
+  | is-ipv4-predicate
+  | is-ipv6-predicate
 
 equal-predicate: "==" sp predicate-value
 
@@ -359,6 +364,10 @@ collection-predicate: "isCollection"
 date-predicate: "isDate"
 
 iso-date-predicate: "isIsoDate"
+
+is-ipv4-predicate: "isIpv4"
+
+is-ipv6-predicate: "isIpv6"
 
 predicate-value:
     boolean
@@ -459,7 +468,7 @@ filename: (filename-content | placeholder)*
 
 filename-content: (filename-text | filename-escaped-char)*
 
-filename-text: ~[#;{} \n\\]+
+filename-text: ~[#;{} \n\r\\]+
 
 filename-escaped-char: "\\" ( "\\" | "b" | "f" | "n" | "r" | "t" | "#" | ";"| " " | "{" | "}" | "u" unicode-char)
 
@@ -468,7 +477,7 @@ filename-password: (filename-password-content | placeholder)*
 
 filename-password-content: (filename-password-text | filename-password-escaped-char)*
 
-filename-password-text: ~[#;{} \n\\]+
+filename-password-text: ~[#;{} \n\r\\]+
 
 filename-password-escaped-char: "\\" ( "\\" | "b" | "f" | "n" | "r" | "t" | "#" | ";" | " " | "{" | "}" | ":" | "u" unicode-char)
 
@@ -552,6 +561,7 @@ filter:
   | to-date-filter
   | to-float-filter
   | to-int-filter
+  | to-string-filter
   | url-decode-filter
   | url-encode-filter
   | xpath-filter
@@ -584,11 +594,13 @@ replace-filter: "replace" sp (quoted-string | regex) sp quoted-string
 
 split-filter: "split" sp quoted-string
 
-to-date-filter: "toDate"
+to-date-filter: "toDate" sp quoted-string
 
 to-float-filter: "toFloat"
 
 to-int-filter: "toInt"
+
+to-string-filter: "toString"
 
 url-decode-filter: "urlDecode"
 

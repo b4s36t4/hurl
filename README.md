@@ -147,7 +147,7 @@ Finally, Hurl is easy to <b>integrate in CI/CD</b>, with text, JUnit, TAP and HT
 Hurl is a lightweight binary written in [Rust]. Under the hood, Hurl HTTP engine is
 powered by [libcurl], one of the most powerful and reliable file transfer libraries.
 With its text file format, Hurl adds syntactic sugar to run and test HTTP requests,
-but it's still the [curl] that we love: __fast__, __efficient__ and __HTTP/3 ready__.
+but it's still the [curl] that we love: __fast__, __efficient__ and __IPv6 / HTTP/3 ready__.
 
 # Feedbacks
 
@@ -209,12 +209,14 @@ HTTP 200
         * [JSON Output](#json-output)
     * [Others](#others)
         * [HTTP Version](#http-version)
+        * [IP Address](#ip-address)
         * [Polling and Retry](#polling-and-retry)
         * [Delaying Requests](#delaying-requests)
         * [Skipping Requests](#skipping-requests)
         * [Testing Endpoint Performance](#testing-endpoint-performance)
         * [Using SOAP APIs](#using-soap-apis)
         * [Capturing and Using a CSRF Token](#capturing-and-using-a-csrf-token)
+        * [Redacting Secrets](#redacting-secrets)
         * [Checking Byte Order Mark (BOM) in Response Body](#checking-byte-order-mark-bom-in-response-body)
         * [AWS Signature Version 4 Requests](#aws-signature-version-4-requests)
         * [Using curl Options](#using-curl-options)
@@ -339,7 +341,7 @@ Connection: keep-alive
 
 ```hurl
 GET https://example.org/news
-[QueryStringParams]
+[Query]
 order: newest
 search: something to search
 count: 100
@@ -351,7 +353,7 @@ Or:
 GET https://example.org/news?order=newest&search=something%20to%20search&count=100
 ```
 
-> With `[QueryStringParams]` section, params don't need to be URL escaped.
+> With `[Query]` section, params don't need to be URL escaped.
 
 [Doc](https://hurl.dev/docs/request.html#query-parameters)
 
@@ -416,7 +418,7 @@ HTTP 200
 
 ```hurl
 POST https://example.org/contact
-[FormParams]
+[Form]
 default: false
 token: {{token}}
 email: john.doe@rookie.org
@@ -429,7 +431,7 @@ number: 33611223344
 
 ```hurl
 POST https://example.org/upload
-[MultipartFormData]
+[Multipart]
 field1: value1
 field2: file,example.txt;
 # One can specify the file content type:
@@ -606,7 +608,7 @@ A file that creates a dynamic query parameter (i.e `2024-12-02T10:35:44.461731Z`
 
 ```hurl
 GET https://example.org/api/foo
-[QueryStringParams]
+[Query]
 date: {{newDate}}
 HTTP 200
 ```
@@ -860,7 +862,6 @@ file,data.bin;
 
 [Doc](https://hurl.dev/docs/asserting-response.html#file-body)
 
-
 ## Reports
 
 ### HTML Report
@@ -905,12 +906,11 @@ A structured output of running Hurl files can be obtained with [`--json` option]
 $ hurl --json *.hurl
 ```
 
-
 ## Others
 
 ### HTTP Version
 
-Testing HTTP version (HTTP/1.0, HTTP/1.1, HTTP/2 or HTTP/3):
+Testing HTTP version (HTTP/1.0, HTTP/1.1, HTTP/2 or HTTP/3) can be done using implicit asserts:
 
 ```hurl
 GET https://foo.com
@@ -921,6 +921,37 @@ HTTP/2 200
 ```
 
 [Doc](https://hurl.dev/docs/asserting-response.html#version-status)
+
+Or explicit:
+
+```hurl
+GET https://foo.com
+HTTP 200
+[Asserts]
+version == "3"
+
+GET https://bar.com
+HTTP 200
+[Asserts]
+version == "2"
+version toFloat > 1.1
+```
+
+[Doc](https://hurl.dev/docs/asserting-response.html#version-assert)
+
+### IP Address
+
+Testing the IP address of the response, as a string. This string may be IPv6 address:
+
+```hurl
+GET https://foo.com
+HTTP 200
+[Asserts]
+ip == "2001:0db8:85a3:0000:0000:8a2e:0370:733"
+ip startsWith "2001"
+ip isIpv6
+```
+
 
 ### Polling and Retry
 
@@ -983,7 +1014,6 @@ GET https://example.org/d
 
 [Doc](https://hurl.dev/docs/manual.html#skip)
 
-
 ### Testing Endpoint Performance
 
 ```hurl
@@ -1031,6 +1061,47 @@ HTTP 302
 
 [Doc](https://hurl.dev/docs/capturing-response.html#xpath-capture)
 
+### Redacting Secrets
+
+Using command-line for known values:
+
+```shell
+$ hurl --secret token=1234 file.hurl
+```
+
+```hurl
+POST https://example.org
+X-Token: {{token}}
+{
+  "name": "Alice",
+  "value": 100
+}
+HTTP 200
+```
+
+[Doc](https://hurl.dev/docs/templates.html#secrets)
+
+Using `redact` for dynamic values:
+
+```hurl
+# Get an authorization token:
+GET https://example.org/token
+HTTP 200
+[Captures]
+token: header "X-Token" redact
+
+# Send an authorized request:
+POST https://example.org
+X-Token: {{token}}
+{
+  "name": "Alice",
+  "value": 100
+}
+HTTP 200
+```
+
+[Doc](https://hurl.dev/docs/capturing-response.html#redacting-secrets)
+
 ### Checking Byte Order Mark (BOM) in Response Body
 
 ```hurl
@@ -1050,7 +1121,7 @@ Generate signed API requests with [AWS Signature Version 4], as used by several 
 POST https://sts.eu-central-1.amazonaws.com/
 [Options]
 aws-sigv4: aws:amz:eu-central-1:sts
-[FormParams]
+[Form]
 Action: GetCallerIdentity
 Version: 2011-06-15
 ```
@@ -1062,7 +1133,7 @@ POST https://sts.eu-central-1.amazonaws.com/
 [Options]
 aws-sigv4: aws:amz:eu-central-1:sts
 user: bob=secret
-[FormParams]
+[Form]
 Action: GetCallerIdentity
 Version: 2011-06-15
 ```
@@ -1255,7 +1326,7 @@ will follow a redirection only for the second entry.
 | <a href="#connect-to" id="connect-to"><code>--connect-to &lt;HOST1:PORT1:HOST2:PORT2&gt;</code></a>               | For a request to the given HOST1:PORT1 pair, connect to HOST2:PORT2 instead. This option can be used several times in a command line.<br><br>See also [`--resolve`](#resolve).<br>                                                                                                                                                                                                                                                   |
 | <a href="#continue-on-error" id="continue-on-error"><code>--continue-on-error</code></a>                          | Continue executing requests to the end of the Hurl file even when an assert error occurs.<br>By default, Hurl exits after an assert error in the HTTP response.<br><br>Note that this option does not affect the behavior with multiple input Hurl files.<br><br>All the input files are executed independently. The result of one file does not affect the execution of the other Hurl files.<br><br>This is a cli-only option.<br> |
 | <a href="#cookie" id="cookie"><code>-b, --cookie &lt;FILE&gt;</code></a>                                          | Read cookies from FILE (using the Netscape cookie file format).<br><br>Combined with [`-c, --cookie-jar`](#cookie-jar), you can simulate a cookie storage between successive Hurl runs.<br><br>This is a cli-only option.<br>                                                                                                                                                                                                        |
-| <a href="#cookie-jar" id="cookie-jar"><code>-c, --cookie-jar &lt;FILE&gt;</code></a>                              | Write cookies to FILE after running the session.<br>The file will be written using the Netscape cookie file format.<br><br>Combined with [`-b, --cookie`](#cookie), you can simulate a cookie storage between successive Hurl runs.<br><br>This is a cli-only option.<br>                                                                                                                                     |
+| <a href="#cookie-jar" id="cookie-jar"><code>-c, --cookie-jar &lt;FILE&gt;</code></a>                              | Write cookies to FILE after running the session.<br>The file will be written using the Netscape cookie file format.<br><br>Combined with [`-b, --cookie`](#cookie), you can simulate a cookie storage between successive Hurl runs.<br><br>This is a cli-only option.<br>                                                                                                                                                            |
 | <a href="#curl" id="curl"><code>--curl &lt;FILE&gt;</code></a>                                                    | Export each request to a list of curl commands.<br><br>This is a cli-only option.<br>                                                                                                                                                                                                                                                                                                                                                |
 | <a href="#delay" id="delay"><code>--delay &lt;MILLISECONDS&gt;</code></a>                                         | Sets delay before each request (aka sleep). The delay is not applied to requests that have been retried because of [`--retry`](#retry). See [`--retry-interval`](#retry-interval) to space retried requests.<br><br>You can specify time units in the delay expression. Set Hurl to use a delay of 2 seconds with `--delay 2s` or set it to 500 milliseconds with `--delay 500ms`. No spaces allowed.<br>                            |
 | <a href="#error-format" id="error-format"><code>--error-format &lt;FORMAT&gt;</code></a>                          | Control the format of error message (short by default or long)<br><br>This is a cli-only option.<br>                                                                                                                                                                                                                                                                                                                                 |
@@ -1354,29 +1425,29 @@ curl(1)  hurlfmt(1)
 
 ### Linux
 
-Precompiled binary is available at [Hurl latest GitHub release]:
+Precompiled binary (depending on libc >=2.35) is available at [Hurl latest GitHub release]:
 
 ```shell
 $ INSTALL_DIR=/tmp
-$ VERSION=6.0.0
+$ VERSION=6.1.1
 $ curl --silent --location https://github.com/Orange-OpenSource/hurl/releases/download/$VERSION/hurl-$VERSION-x86_64-unknown-linux-gnu.tar.gz | tar xvz -C $INSTALL_DIR
 $ export PATH=$INSTALL_DIR/hurl-$VERSION-x86_64-unknown-linux-gnu/bin:$PATH
 ```
 
 #### Debian / Ubuntu
 
-For Debian / Ubuntu, Hurl can be installed using a binary .deb file provided in each Hurl release.
+For Debian >=12 / Ubuntu >=22.04, Hurl can be installed using a binary .deb file provided in each Hurl release.
 
 ```shell
-$ VERSION=6.0.0
+$ VERSION=6.1.1
 $ curl --location --remote-name https://github.com/Orange-OpenSource/hurl/releases/download/$VERSION/hurl_${VERSION}_amd64.deb
 $ sudo apt update && sudo apt install ./hurl_${VERSION}_amd64.deb
 ```
 
-For Ubuntu (bionic, focal, jammy, noble), Hurl can be installed from `ppa:lepapareil/hurl`
+For Ubuntu >=18.04, Hurl can be installed from `ppa:lepapareil/hurl`
 
 ```shell
-$ VERSION=6.0.0
+$ VERSION=6.1.1
 $ sudo apt-add-repository -y ppa:lepapareil/hurl
 $ sudo apt install hurl="${VERSION}"*
 ```
@@ -1458,7 +1529,7 @@ $ winget install hurl
 If you're a Rust programmer, Hurl can be installed with cargo.
 
 ```shell
-$ cargo install hurl
+$ cargo install --locked hurl
 ```
 
 ### conda-forge
@@ -1561,9 +1632,9 @@ Please follow the [contrib on Windows section].
 [GitHub]: https://github.com/Orange-OpenSource/hurl
 [libcurl]: https://curl.se/libcurl/
 [star Hurl on GitHub]: https://github.com/Orange-OpenSource/hurl/stargazers
-[HTML]: /docs/standalone/hurl-6.0.0.html
-[PDF]: /docs/standalone/hurl-6.0.0.pdf
-[Markdown]: /docs/standalone/hurl-6.0.0.md
+[HTML]: /docs/standalone/hurl-6.1.0.html
+[PDF]: /docs/standalone/hurl-6.1.0.pdf
+[Markdown]: /docs/standalone/hurl-6.1.0.md
 [JSON body]: https://hurl.dev/docs/request.html#json-body
 [XML body]: https://hurl.dev/docs/request.html#xml-body
 [XML multiline string body]: https://hurl.dev/docs/request.html#multiline-string-body

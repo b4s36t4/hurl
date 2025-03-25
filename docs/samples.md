@@ -76,7 +76,7 @@ Connection: keep-alive
 
 ```hurl
 GET https://example.org/news
-[QueryStringParams]
+[Query]
 order: newest
 search: something to search
 count: 100
@@ -88,7 +88,7 @@ Or:
 GET https://example.org/news?order=newest&search=something%20to%20search&count=100
 ```
 
-> With `[QueryStringParams]` section, params don't need to be URL escaped.
+> With `[Query]` section, params don't need to be URL escaped.
 
 [Doc](/docs/request.md#query-parameters)
 
@@ -153,7 +153,7 @@ HTTP 200
 
 ```hurl
 POST https://example.org/contact
-[FormParams]
+[Form]
 default: false
 token: {{token}}
 email: john.doe@rookie.org
@@ -166,7 +166,7 @@ number: 33611223344
 
 ```hurl
 POST https://example.org/upload
-[MultipartFormData]
+[Multipart]
 field1: value1
 field2: file,example.txt;
 # One can specify the file content type:
@@ -343,7 +343,7 @@ A file that creates a dynamic query parameter (i.e `2024-12-02T10:35:44.461731Z`
 
 ```hurl
 GET https://example.org/api/foo
-[QueryStringParams]
+[Query]
 date: {{newDate}}
 HTTP 200
 ```
@@ -645,7 +645,7 @@ $ hurl --json *.hurl
 
 ### HTTP Version
 
-Testing HTTP version (HTTP/1.0, HTTP/1.1, HTTP/2 or HTTP/3):
+Testing HTTP version (HTTP/1.0, HTTP/1.1, HTTP/2 or HTTP/3) can be done using implicit asserts:
 
 ```hurl
 GET https://foo.com
@@ -656,6 +656,37 @@ HTTP/2 200
 ```
 
 [Doc](/docs/asserting-response.md#version-status)
+
+Or explicit:
+
+```hurl
+GET https://foo.com
+HTTP 200
+[Asserts]
+version == "3"
+
+GET https://bar.com
+HTTP 200
+[Asserts]
+version == "2"
+version toFloat > 1.1
+```
+
+[Doc](/docs/asserting-response.md#version-assert)
+
+### IP Address
+
+Testing the IP address of the response, as a string. This string may be IPv6 address:
+
+```hurl
+GET https://foo.com
+HTTP 200
+[Asserts]
+ip == "2001:0db8:85a3:0000:0000:8a2e:0370:733"
+ip startsWith "2001"
+ip isIpv6
+```
+
 
 ### Polling and Retry
 
@@ -778,7 +809,7 @@ POST https://example.org
 X-Token: {{token}}
 {
   "name": "Alice",
-  "value: 100
+  "value": 100
 }
 HTTP 200
 ```
@@ -799,7 +830,7 @@ POST https://example.org
 X-Token: {{token}}
 {
   "name": "Alice",
-  "value: 100
+  "value": 100
 }
 HTTP 200
 ```
@@ -825,7 +856,7 @@ Generate signed API requests with [AWS Signature Version 4], as used by several 
 POST https://sts.eu-central-1.amazonaws.com/
 [Options]
 aws-sigv4: aws:amz:eu-central-1:sts
-[FormParams]
+[Form]
 Action: GetCallerIdentity
 Version: 2011-06-15
 ```
@@ -837,7 +868,7 @@ POST https://sts.eu-central-1.amazonaws.com/
 [Options]
 aws-sigv4: aws:amz:eu-central-1:sts
 user: bob=secret
-[FormParams]
+[Form]
 Action: GetCallerIdentity
 Version: 2011-06-15
 ```

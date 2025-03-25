@@ -1,10 +1,29 @@
-[6.1.0 (TBD)](https://github.com/Orange-OpenSource/hurl/blob/master/CHANGELOG.md#6.1.0)
+[6.1.1 (2025-03-19)](https://github.com/Orange-OpenSource/hurl/blob/master/CHANGELOG.md#6.1.1)
 ========================================================================================================================
 
 Thanks to
+[@lu-zero](https://github.com/lu-zero),
+[@andrejohansson](https://github.com/andrejohansson),
+[@demostanis](https://github.com/demostanis),
+[@techfg](https://github.com/techfg),
+
+Bugs Fixed:
+
+* Fix hurlfmt spacing [#3839](https://github.com/Orange-OpenSource/hurl/issues/3839)
+* Fix filename parsing [#3848](https://github.com/Orange-OpenSource/hurl/issues/3848)
+* Fix jsonpath array wildcard with missing attribute [#3859](https://github.com/Orange-OpenSource/hurl/issues/3859) [#3869](https://github.com/Orange-OpenSource/hurl/issues/3869)
+* Fix predicate `contains` with none input [#3868](https://github.com/Orange-OpenSource/hurl/issues/3868)
+
+
+[6.1.0 (2025-03-12)](https://github.com/Orange-OpenSource/hurl/blob/master/CHANGELOG.md#6.1.0)
+========================================================================================================================
+
+Thanks to
+[@lilyhuang-github](https://github.com/lilyhuang-github),
 [@ashishajr](https://github.com/ashishajr),
 [@kidbrax](https://github.com/kidbrax),
 [@theoforger](https://github.com/theoforger),
+[@smokedlinq](https://github.com/smokedlinq),
 [@docwhat](https://github.com/docwhat),
 [@glb-cblin](https://github.com/glb-cblin),
 [@Enoz](https://github.com/Enoz),
@@ -12,6 +31,7 @@ Thanks to
 [@uday-rana](https://github.com/uday-rana),
 [@lu-zero](https://github.com/lu-zero),
 [@nghiab1906724](https://github.com/nghiab1906724),
+[@overbyte](https://github.com/overbyte),
 
 Breaking Changes:
 
@@ -21,9 +41,10 @@ Breaking Changes:
 
 Enhancements:
 
+* Removed limitation for --cookie-jar to use only one hurl file [#2537](https://github.com/Orange-OpenSource/hurl/issues/2537)
 * Add HTTP version query [#1706](https://github.com/Orange-OpenSource/hurl/issues/1706)
-* Deprecate includes in favor of contains predicate [#1896](https://github.com/Orange-OpenSource/hurl/issues/1896)
 * Add curl -H/--header option to globally add headers to all requests [#1905](https://github.com/Orange-OpenSource/hurl/issues/1905) [#2144](https://github.com/Orange-OpenSource/hurl/issues/2144)
+* Add toString Filter [#2035](https://github.com/Orange-OpenSource/hurl/issues/2035) [#3798](https://github.com/Orange-OpenSource/hurl/issues/3798)
 * Add base64 decode filter [#2145](https://github.com/Orange-OpenSource/hurl/issues/2145)
 * Add base64 encode filter [#2145](https://github.com/Orange-OpenSource/hurl/issues/2145)
 * Redacts secrets from JUnit reports [#2947](https://github.com/Orange-OpenSource/hurl/issues/2947) [#2972](https://github.com/Orange-OpenSource/hurl/issues/2972)
@@ -38,6 +59,7 @@ Enhancements:
 * Add header option per request [#3575](https://github.com/Orange-OpenSource/hurl/issues/3575)
 * Fix invalid escape in hurlfmt parse func [#3615](https://github.com/Orange-OpenSource/hurl/issues/3615)
 * hurlfmt: Use Hurl predicates identifiers for Hurl to JSON file export [#3662](https://github.com/Orange-OpenSource/hurl/issues/3662)
+* Add aarch64 deb package [#3829](https://github.com/Orange-OpenSource/hurl/issues/3829)
 
 
 Bugs Fixed:
@@ -46,9 +68,21 @@ Bugs Fixed:
 * Eval template in JSON object key [#3593](https://github.com/Orange-OpenSource/hurl/issues/3593)
 * Show error message if format is invalid in `format` filter [#3613](https://github.com/Orange-OpenSource/hurl/issues/3613)
 * Create parent folders if missing when using --cookie-jar FILE [#3637](https://github.com/Orange-OpenSource/hurl/issues/3637)
-* Remove lint errors [#3648](https://github.com/Orange-OpenSource/hurl/issues/3648)
+* Remove lint errors and Fix non-zero exit code in case of error [#3648](https://github.com/Orange-OpenSource/hurl/issues/3648)
 * Support BigInteger in variable [#3656](https://github.com/Orange-OpenSource/hurl/issues/3656)
+* fix hurlfmt html export loosing some whitespaces [#3675](https://github.com/Orange-OpenSource/hurl/issues/3675)
+* Fix template to source [#3675](https://github.com/Orange-OpenSource/hurl/issues/3675)
 * Fix changing HTTP version per request sometimes not effective [#3719](https://github.com/Orange-OpenSource/hurl/issues/3719)
+* Add bash file completion for hurl/hurlfmt [#3750](https://github.com/Orange-OpenSource/hurl/issues/3750)
+* Fix multilines HTML export [#3768](https://github.com/Orange-OpenSource/hurl/issues/3768)
+* Change parsing file content type in multipart form data [#3796](https://github.com/Orange-OpenSource/hurl/issues/3796)
+
+
+Deprecations:
+
+* Deprecate includes in favor of contains predicate [#1896](https://github.com/Orange-OpenSource/hurl/issues/1896)
+* Warn for deprecated multilines string attributes [#3622](https://github.com/Orange-OpenSource/hurl/issues/3622)
+* Warn for --interactive deprecation [#3763](https://github.com/Orange-OpenSource/hurl/issues/3763)
 
 
 [6.0.0 (2024-12-03)](https://github.com/Orange-OpenSource/hurl/blob/master/CHANGELOG.md#6.0.0)
