@@ -41,5 +41,7 @@ mod to_int;
 mod to_string;
 mod url_decode;
 mod url_encode;
+mod url_query_param;
+
 #[cfg(not(target_arch = "wasm32"))]
 mod xpath;
