@@ -8,7 +8,7 @@ description = "Hurl, run and test HTTP requests"
 documentation = "https://hurl.dev"
 homepage = "https://hurl.dev"
 repository = "https://github.com/Orange-OpenSource/hurl"
-rust-version = "1.85.0"
+rust-version = "1.85.1"
 
 [lib]
 name = "hurl"
@@ -45,7 +45,7 @@ similar = "2.7.0"
 terminal_size = "0.4.2"
 
 [target.'cfg(unix)'.dependencies]
-termion = "4.0.4"
+termion = "4.0.5"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 libxml = "0.3.3"

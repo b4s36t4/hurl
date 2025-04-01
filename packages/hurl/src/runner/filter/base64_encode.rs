@@ -52,19 +52,17 @@ mod tests {
             source_info: SourceInfo::new(Pos::new(1, 1), Pos::new(1, 1)),
             value: FilterValue::Base64Encode,
         };
-        let bytes = vec![
-            0xe4, 0xbd, 0xa0, 0xe5, 0xa5, 0xbd, 0xe4, 0xb8, 0x96, 0xe7, 0x95, 0x8c,
-        ];
+        let bytes = vec![0x3c, 0x3c, 0x3f, 0x3f, 0x3f, 0x3e, 0x3e];
 
         let ret = eval_filter(&filter, &Value::Bytes(bytes), &variables, false);
         assert_eq!(
             ret.unwrap().unwrap(),
-            Value::String("5L2g5aW95LiW55WM".to_string())
+            Value::String("PDw/Pz8+Pg==".to_string())
         );
     }
 
     #[test]
-    fn eval_filter_base64_encode_ok_invalid_input() {
+    fn eval_filter_base64_encode_ko_invalid_input() {
         let variables = VariableSet::new();
         let filter = Filter {
             source_info: SourceInfo::new(Pos::new(1, 1), Pos::new(1, 1)),
