@@ -21,7 +21,10 @@
 //! returned by an HTTP exchange are exposed.
 pub use self::call::Call;
 pub use self::certificate::Certificate;
-pub(crate) use self::client::Client;
+#[cfg(target_arch = "wasm32")]
+pub(crate) use self::client::client_wasm::Client;
+#[cfg(not(target_arch = "wasm32"))]
+pub(crate) use self::client::client::Client;
 pub use self::cookie::{CookieAttribute, ResponseCookie};
 pub use self::core::Cookie;
 pub(crate) use self::core::{Param, RequestCookie};
@@ -38,6 +41,7 @@ pub use self::response::{HttpVersion, Response};
 pub use self::tests::*;
 pub use self::timings::Timings;
 pub use self::url::{Url, UrlError};
+#[cfg(not(target_arch = "wasm32"))]
 pub use self::version::libcurl_version_info;
 
 mod call;
@@ -47,7 +51,9 @@ mod cookie;
 mod core;
 mod curl_cmd;
 mod debug;
+#[cfg(not(target_arch = "wasm32"))]
 mod easy_ext;
+
 mod error;
 mod header;
 mod headers_helper;
@@ -65,4 +71,5 @@ mod tests;
 mod timings;
 mod timings_debug;
 mod url;
+#[cfg(not(target_arch = "wasm32"))]
 mod version;

@@ -26,6 +26,7 @@ use crate::http;
 use crate::runner::cache::BodyCache;
 use crate::runner::error::{RunnerError, RunnerErrorKind};
 use crate::runner::template::eval_template;
+#[cfg(not(target_arch = "wasm32"))]
 use crate::runner::xpath::{Document, Format};
 use crate::runner::{filter, Number, Value, VariableSet};
 
@@ -49,6 +50,7 @@ pub fn eval_query(
             ..
         } => eval_query_cookie(last_response, name, attribute, variables),
         QueryValue::Body => eval_query_body(last_response, query.source_info),
+        #[cfg(not(target_arch = "wasm32"))]
         QueryValue::Xpath { expr, .. } => {
             eval_query_xpath(last_response, cache, expr, variables, query.source_info)
         }
@@ -156,6 +158,7 @@ fn eval_query_body(response: &http::Response, query_source_info: SourceInfo) -> 
 /// Evaluates a XPath expression on the HTTP `response` body, given a set of `variables`.
 ///
 /// `query_source_info` is the source position of the query, used if an error is returned.
+#[cfg(not(target_arch = "wasm32"))]
 fn eval_query_xpath(
     response: &http::Response,
     cache: &mut BodyCache,
@@ -174,6 +177,7 @@ fn eval_query_xpath(
 /// response `cache`.
 ///
 /// `query_source_info` is used for error reporting.
+#[cfg(not(target_arch = "wasm32"))]
 fn parse_cache_xml<'cache>(
     response: &http::Response,
     cache: &'cache mut BodyCache,
@@ -374,22 +378,30 @@ fn eval_query_md5(response: &http::Response, query_source_info: SourceInfo) -> Q
 }
 
 /// Evaluates the SSL certificate attribute, of the HTTP `response`.
+#[allow(unused_variables)]
 fn eval_query_certificate(
     response: &http::Response,
     certificate_attribute: CertificateAttributeName,
 ) -> QueryResult {
-    if let Some(certificate) = &response.certificate {
-        let value = match certificate_attribute {
-            CertificateAttributeName::Subject => Value::String(certificate.subject.clone()),
-            CertificateAttributeName::Issuer => Value::String(certificate.issuer.clone()),
-            CertificateAttributeName::StartDate => Value::Date(certificate.start_date),
-            CertificateAttributeName::ExpireDate => Value::Date(certificate.expire_date),
-            CertificateAttributeName::SerialNumber => {
-                Value::String(certificate.serial_number.clone())
-            }
-        };
-        Ok(Some(value))
-    } else {
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        if let Some(certificate) = &response.certificate {
+            let value = match certificate_attribute {
+                CertificateAttributeName::Subject => Value::String(certificate.subject.clone()),
+                CertificateAttributeName::Issuer => Value::String(certificate.issuer.clone()),
+                CertificateAttributeName::StartDate => Value::Date(certificate.start_date),
+                CertificateAttributeName::ExpireDate => Value::Date(certificate.expire_date),
+                CertificateAttributeName::SerialNumber => {
+                    Value::String(certificate.serial_number.clone())
+                }
+            };
+            Ok(Some(value))
+        } else {
+            Ok(None)
+        }
+    }
+    #[cfg(target_arch = "wasm32")]
+    {
         Ok(None)
     }
 }

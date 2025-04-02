@@ -149,6 +149,7 @@ pub enum QueryValue {
         expr: CookiePath,
     },
     Body,
+    #[cfg(not(target_arch = "wasm32"))]
     Xpath {
         space0: Whitespace,
         expr: Template,
@@ -186,6 +187,7 @@ impl QueryValue {
             QueryValue::Header { .. } => "header",
             QueryValue::Cookie { .. } => "cookie",
             QueryValue::Body => "body",
+            #[cfg(not(target_arch = "wasm32"))]
             QueryValue::Xpath { .. } => "xpath",
             QueryValue::Jsonpath { .. } => "jsonpath",
             QueryValue::Regex { .. } => "regex",

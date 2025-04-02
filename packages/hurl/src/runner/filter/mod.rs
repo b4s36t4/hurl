@@ -18,6 +18,8 @@
 
 pub use eval::eval_filters;
 pub use jsonpath::eval_jsonpath_json;
+
+#[cfg(not(target_arch = "wasm32"))]
 pub use xpath::eval_xpath_doc;
 
 mod base64_decode;

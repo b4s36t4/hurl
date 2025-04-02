@@ -42,6 +42,7 @@ fn query_value(reader: &mut Reader) -> ParseResult<QueryValue> {
             header_query,
             cookie_query,
             body_query,
+            #[cfg(not(target_arch = "wasm32"))]
             xpath_query,
             jsonpath_query,
             regex_query,
@@ -102,6 +103,7 @@ fn body_query(reader: &mut Reader) -> ParseResult<QueryValue> {
     Ok(QueryValue::Body)
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn xpath_query(reader: &mut Reader) -> ParseResult<QueryValue> {
     try_literal("xpath", reader)?;
     let space0 = one_or_more_spaces(reader)?;

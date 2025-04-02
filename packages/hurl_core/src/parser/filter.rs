@@ -76,6 +76,7 @@ pub fn filter(reader: &mut Reader) -> ParseResult<Filter> {
             url_decode_filter,
             url_encode_filter,
             url_query_param_filter,
+            #[cfg(not(target_arch = "wasm32"))]
             xpath_filter,
         ],
         reader,
@@ -238,6 +239,7 @@ fn url_query_param_filter(reader: &mut Reader) -> ParseResult<FilterValue> {
     Ok(FilterValue::UrlQueryParam { space0, param })
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn xpath_filter(reader: &mut Reader) -> ParseResult<FilterValue> {
     try_literal("xpath", reader)?;
     let space0 = one_or_more_spaces(reader)?;

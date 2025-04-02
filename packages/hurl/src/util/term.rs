@@ -19,6 +19,7 @@
 use std::io;
 #[cfg(target_family = "windows")]
 use std::io::IsTerminal;
+#[cfg(not(target_arch = "wasm32"))]
 use std::io::Write;
 
 /// The way to write on standard output and error: either immediate like `println!` macro,
@@ -52,12 +53,20 @@ impl Stdout {
         }
     }
 
+    #[cfg(not(target_arch = "wasm32"))]
     /// Attempts to write an entire buffer into standard output.
     pub fn write_all(&mut self, buf: &[u8]) -> Result<(), io::Error> {
         match self.mode {
             WriteMode::Immediate => write_stdout(buf),
             WriteMode::Buffered => self.buffer.write_all(buf),
         }
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    /// Attempts to write an entire buffer into standard output.
+    pub fn write_all(&mut self, _buf: &[u8]) -> Result<(), io::Error> {
+        println!("Not possible");
+        Ok(())
     }
 
     /// Returns the buffered standard output.

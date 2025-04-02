@@ -16,9 +16,9 @@
  *
  */
 
-use std::path::Path;
+// use std::path::Path;
 
-use cc::Build;
+// use cc::Build;
 #[cfg(windows)]
 use winres::WindowsResource;
 
@@ -33,11 +33,11 @@ fn set_icon() {
 fn set_icon() {}
 
 fn main() {
-    let project_root = Path::new(env!("CARGO_MANIFEST_DIR"));
-    let native_src = project_root.join("native");
+    // let project_root = Path::new(env!("CARGO_MANIFEST_DIR"));
+    // let native_src = project_root.join("native");
     set_icon();
-    Build::new()
-        .file(native_src.join("libxml.c"))
-        .flag_if_supported("-Wno-unused-parameter") // unused parameter in silent callback
-        .compile("mylib");
+    // Build::new()
+    //     .file(native_src.join("libxml.c"))
+    //     .flag_if_supported("-Wno-unused-parameter") // unused parameter in silent callback
+    //     .compile("mylib");
 }

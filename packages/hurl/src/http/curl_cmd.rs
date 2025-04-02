@@ -21,7 +21,11 @@ use std::path::Path;
 
 use hurl_core::typing::Count;
 
-use crate::http::client::all_cookies;
+#[cfg(not(target_arch = "wasm32"))]
+use crate::http::client::client::all_cookies;
+#[cfg(target_arch = "wasm32")]
+use crate::http::client::client_wasm::all_cookies;
+
 use crate::http::{
     Body, ClientOptions, Cookie, FileParam, Header, HeaderVec, IpResolve, Method, MultipartParam,
     Param, RequestSpec, RequestedHttpVersion, CONTENT_TYPE,

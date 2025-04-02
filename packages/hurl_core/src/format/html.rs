@@ -384,6 +384,7 @@ impl HtmlFormatter {
                 self.fmt_space(space0);
                 self.fmt_cookie_path(expr);
             }
+            #[cfg(not(target_arch = "wasm32"))]
             QueryValue::Xpath { space0, expr } => {
                 self.fmt_space(space0);
                 self.fmt_template(expr);
@@ -787,6 +788,7 @@ impl HtmlFormatter {
                 self.fmt_space(space0);
                 self.fmt_template(param);
             }
+            #[cfg(not(target_arch = "wasm32"))]
             FilterValue::XPath { space0, expr } => {
                 self.fmt_space(space0);
                 self.fmt_template(expr);

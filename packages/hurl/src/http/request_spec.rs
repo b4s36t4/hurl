@@ -87,6 +87,13 @@ impl Body {
             Body::File(bs, _) => bs.clone(),
         }
     }
+
+    pub fn string(&self) -> Option<&String> {
+        match self {
+            Body::Text(s) => Some(s),
+            _ => None
+        }
+    }
 }
 
 impl fmt::Display for Method {

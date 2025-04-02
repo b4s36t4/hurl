@@ -18,8 +18,10 @@
 use std::time::Duration;
 
 use chrono::{DateTime, Utc};
-use curl::easy::Easy;
 
+#[cfg(not(target_arch = "wasm32"))]
+use curl::easy::Easy;
+#[cfg(not(target_arch = "wasm32"))]
 use crate::http::easy_ext;
 
 /// Timing information for an HTTP transfer (see <https://hurl.dev/docs/response.html#timings>).
@@ -39,6 +41,7 @@ pub struct Timings {
 }
 
 impl Timings {
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn new(easy: &mut Easy, begin_call: DateTime<Utc>, end_call: DateTime<Utc>) -> Self {
         // We try the *_t timing function of libcurl (available for libcurl >= 7.61.0)
         // returning timing in nanoseconds, or fallback to timing function returning seconds

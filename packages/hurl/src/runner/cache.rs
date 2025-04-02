@@ -17,6 +17,7 @@
  */
 use serde_json::Value;
 
+#[cfg(not(target_arch = "wasm32"))]
 use crate::runner::xpath::Document;
 
 /// This is a cache to hold parsed structured data (XML/JSON/text), computed from an HTTP response
@@ -25,6 +26,7 @@ use crate::runner::xpath::Document;
 /// through this cache).
 #[derive(Default)]
 pub struct BodyCache {
+    #[cfg(not(target_arch = "wasm32"))]
     /// The parsed XML document.
     xml: Option<Document>,
     /// The parsed JSON body
@@ -37,11 +39,13 @@ impl BodyCache {
         BodyCache::default()
     }
 
+    #[cfg(not(target_arch = "wasm32"))]
     /// Returns a reference to a cached XML response.
     pub fn xml(&self) -> Option<&Document> {
         self.xml.as_ref()
     }
 
+    #[cfg(not(target_arch = "wasm32"))]
     /// Caches a XML document `doc`.
     pub fn set_xml(&mut self, xml: Document) {
         self.xml = Some(xml);

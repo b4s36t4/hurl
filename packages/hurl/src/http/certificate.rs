@@ -19,6 +19,7 @@ use std::collections::HashMap;
 
 use chrono::{DateTime, NaiveDateTime, Utc};
 
+#[cfg(not(target_arch = "wasm32"))]
 use crate::http::easy_ext::CertInfo;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -30,6 +31,7 @@ pub struct Certificate {
     pub serial_number: String,
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 impl TryFrom<CertInfo> for Certificate {
     type Error = String;
 

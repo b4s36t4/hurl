@@ -85,7 +85,7 @@ pub fn libcurl_version_info() -> CurlVersionInfo {
     // - CURL_VERSION_MULTI_SSL     (1<<22)
     // - CURL_VERSION_THREADSAFE    (1<<30)
 
-    let all_features = HashMap::from([
+    let all_features: HashMap<&str, bool> = HashMap::from([
         ("AsynchDNS", version.feature_async_dns()),
         ("Debug", version.feature_debug()),
         ("IDN", version.feature_idn()),

@@ -331,6 +331,7 @@ pub enum FilterValue {
         space0: Whitespace,
         param: Template,
     },
+    #[cfg(not(target_arch = "wasm32"))]
     XPath {
         space0: Whitespace,
         expr: Template,
@@ -364,6 +365,7 @@ impl FilterValue {
             FilterValue::UrlDecode => "urlDecode",
             FilterValue::UrlEncode => "urlEncode",
             FilterValue::UrlQueryParam { .. } => "urlQueryParam",
+            #[cfg(not(target_arch = "wasm32"))]
             FilterValue::XPath { .. } => "xpath",
         }
     }

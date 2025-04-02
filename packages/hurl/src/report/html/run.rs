@@ -128,18 +128,21 @@ fn get_call_html(
     text.push_str(&table);
 
     // Certificate
-    if let Some(certificate) = &call.response.certificate {
-        let start_date = certificate.start_date.to_string();
-        let end_date = certificate.expire_date.to_string();
-        let values = vec![
-            ("Subject", certificate.subject.as_str()),
-            ("Issuer", certificate.issuer.as_str()),
-            ("Start Date", start_date.as_str()),
-            ("Expire Date", end_date.as_str()),
-            ("Serial Number", certificate.serial_number.as_str()),
-        ];
-        let table = new_table("Certificate", &values);
-        text.push_str(&table);
+    #[cfg(not(target_arch = "wasm32"))]
+    {
+        if let Some(certificate) = &call.response.certificate {
+            let start_date = certificate.start_date.to_string();
+            let end_date = certificate.expire_date.to_string();
+            let values = vec![
+                ("Subject", certificate.subject.as_str()),
+                ("Issuer", certificate.issuer.as_str()),
+                ("Start Date", start_date.as_str()),
+                ("Expire Date", end_date.as_str()),
+                ("Serial Number", certificate.serial_number.as_str()),
+            ];
+            let table = new_table("Certificate", &values);
+            text.push_str(&table);
+        }
     }
 
     let mut values = call
