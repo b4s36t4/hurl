@@ -65,7 +65,9 @@ impl Stdout {
     #[cfg(target_arch = "wasm32")]
     /// Attempts to write an entire buffer into standard output.
     pub fn write_all(&mut self, _buf: &[u8]) -> Result<(), io::Error> {
-        println!("Not possible");
+        match self.mode {
+            _ => println!("Not possible"),
+        }
         Ok(())
     }
 

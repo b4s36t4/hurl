@@ -15,8 +15,9 @@
  * limitations under the License.
  *
  */
+#[allow(unused_imports)]
 use encoding::DecoderTrap;
-
+#[allow(unused_imports)]
 use crate::http::{mimetype, HeaderVec};
 use crate::util::logger::Logger;
 
@@ -27,6 +28,7 @@ use crate::util::logger::Logger;
 /// request. For an HTTP response, see `[crate::http::Response::log_body]`.
 /// If `debug` is true, logs are printed using debug (with * prefix), otherwise logs are printed
 /// in info.
+#[cfg(not(target_arch = "wasm32"))]
 pub fn log_body(body: &[u8], headers: &HeaderVec, debug: bool, logger: &mut Logger) {
     if let Some(content_type) = headers.content_type() {
         if !mimetype::is_kind_of_text(content_type) {

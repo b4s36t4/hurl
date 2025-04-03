@@ -15,8 +15,11 @@
  * limitations under the License.
  *
  */
+
+#[allow(unused_imports)]
 use std::collections::HashMap;
 
+#[allow(unused_imports)]
 use chrono::{DateTime, NaiveDateTime, Utc};
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -39,20 +42,28 @@ impl TryFrom<CertInfo> for Certificate {
     /// support different "formats" in cert info
     /// - attribute name: "Start date" vs "Start Date"
     /// - date format: "Jan 10 08:29:52 2023 GMT" vs "2023-01-10 08:29:52 GMT"
+    #[cfg(not(target_arch = "wasm32"))]
     fn try_from(cert_info: CertInfo) -> Result<Self, Self::Error> {
-        let attributes = parse_attributes(&cert_info.data);
-        let subject = parse_subject(&attributes)?;
-        let issuer = parse_issuer(&attributes)?;
-        let start_date = parse_start_date(&attributes)?;
-        let expire_date = parse_expire_date(&attributes)?;
-        let serial_number = parse_serial_number(&attributes)?;
-        Ok(Certificate {
-            subject,
-            issuer,
-            start_date,
-            expire_date,
-            serial_number,
-        })
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            let attributes = parse_attributes(&cert_info.data);
+            let subject = parse_subject(&attributes)?;
+            let issuer = parse_issuer(&attributes)?;
+            let start_date = parse_start_date(&attributes)?;
+            let expire_date = parse_expire_date(&attributes)?;
+            let serial_number = parse_serial_number(&attributes)?;
+            return Ok(Certificate {
+                subject,
+                issuer,
+                start_date,
+                expire_date,
+                serial_number,
+            });
+        }
+        #[cfg(target_arch = "wasm32")]
+        {
+            Ok(Err("Doesn't work on wasm"));
+        }
     }
 }
 
@@ -73,6 +84,7 @@ impl TryFrom<CertInfo> for Certificate {
 /// See:
 /// - <integration/hurl/ssl/cacert_to_json.out.pattern>
 /// - https://curl.se/mail/lib-2024-06/0013.html
+#[cfg(not(target_arch = "wasm32"))]
 fn parse_subject(attributes: &HashMap<String, String>) -> Result<String, String> {
     match attributes.get("subject") {
         None => Err(format!("missing Subject attribute in {attributes:?}")),
@@ -81,6 +93,7 @@ fn parse_subject(attributes: &HashMap<String, String>) -> Result<String, String>
 }
 
 /// Parses certificate's issuer attribute.
+#[cfg(not(target_arch = "wasm32"))]
 fn parse_issuer(attributes: &HashMap<String, String>) -> Result<String, String> {
     match attributes.get("issuer") {
         None => Err(format!("missing Issuer attribute in {attributes:?}")),
@@ -88,6 +101,7 @@ fn parse_issuer(attributes: &HashMap<String, String>) -> Result<String, String> 
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn parse_start_date(attributes: &HashMap<String, String>) -> Result<DateTime<Utc>, String> {
     match attributes.get("start date") {
         None => Err(format!("missing start date attribute in {attributes:?}")),
@@ -95,6 +109,7 @@ fn parse_start_date(attributes: &HashMap<String, String>) -> Result<DateTime<Utc
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn parse_expire_date(attributes: &HashMap<String, String>) -> Result<DateTime<Utc>, String> {
     match attributes.get("expire date") {
         None => Err("missing expire date attribute".to_string()),
@@ -102,6 +117,7 @@ fn parse_expire_date(attributes: &HashMap<String, String>) -> Result<DateTime<Ut
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn parse_date(value: &str) -> Result<DateTime<Utc>, String> {
     let naive_date_time = match NaiveDateTime::parse_from_str(value, "%b %d %H:%M:%S %Y GMT") {
         Ok(d) => d,
@@ -111,6 +127,7 @@ fn parse_date(value: &str) -> Result<DateTime<Utc>, String> {
     Ok(naive_date_time.and_local_timezone(Utc).unwrap())
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn parse_serial_number(attributes: &HashMap<String, String>) -> Result<String, String> {
     let value = attributes
         .get("serial number")
@@ -135,6 +152,7 @@ fn parse_serial_number(attributes: &HashMap<String, String>) -> Result<String, S
     Ok(normalized_value)
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn parse_attributes(data: &Vec<String>) -> HashMap<String, String> {
     let mut map = HashMap::new();
     for s in data {
@@ -145,6 +163,7 @@ fn parse_attributes(data: &Vec<String>) -> HashMap<String, String> {
     map
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 fn parse_attribute(s: &str) -> Option<(String, String)> {
     if let Some(index) = s.find(':') {
         let (name, value) = s.split_at(index);

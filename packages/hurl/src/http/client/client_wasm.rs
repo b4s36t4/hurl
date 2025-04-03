@@ -31,7 +31,7 @@ impl Client {
         Client {}
     }
 
-    pub async fn execute_with_redirect(
+    pub fn execute_with_redirect(
         &mut self,
         request_spec: &RequestSpec,
         options: &ClientOptions,
@@ -44,7 +44,8 @@ impl Client {
 
         let mut redirect_count = 0;
         loop {
-            let call = self.execute(&request_spec, &options).await?;
+            // let call = self.execute(&request_spec, &options).await?;
+            let call = futures::executor::block_on(self.execute(&request_spec, &options))?;
             // If we don't follow redirection, we can early exit here.
             if !options.follow_location {
                 calls.push(call);
@@ -330,6 +331,7 @@ impl Header {
 
 impl HeaderVec {
     /// Converts this list of [`Header`] to a lib curl header list.
+    #[cfg(not(target_arch = "wasm32"))]
     fn to_curl_headers(&self) -> Result<(), HttpError> {
         // let mut curl_headers = List::new();
         // for header in self {

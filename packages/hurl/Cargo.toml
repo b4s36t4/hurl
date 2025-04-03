@@ -46,6 +46,8 @@ web-sys = {"version" = "0.3.77", features = ['Headers', 'Request', 'RequestInit'
 wasm-bindgen = {"version" = "0.2.100"}
 web-time = {"version" = "1.1.0"}
 wasm-bindgen-futures = "0.4.50"
+tokio = "1.44.1"
+futures = "0.3.31"
 
 [target.'cfg(unix)'.dependencies]
 termion = "4.0.5"

@@ -51,6 +51,7 @@ pub enum HttpError {
     AllowedResponseSizeExceeded(u64),
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 impl From<curl::Error> for HttpError {
     fn from(err: curl::Error) -> Self {
         let code = err.code() as i32;
