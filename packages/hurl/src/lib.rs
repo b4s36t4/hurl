@@ -43,6 +43,8 @@ pub mod http;
 mod json;
 mod jsonpath;
 pub mod output;
+#[cfg(target_arch = "wasm32")]
+pub mod wasm;
 #[doc(hidden)]
 pub mod parallel;
 pub mod report;
